@@ -1,0 +1,30 @@
+Estoy pensando en hacer una app o web app que facilite las personas mayores, poder ingresar gastos de un mes y que luego genere un documento con el resumen de los gastos que se han generado. Haciendo una totalización
+También tal vez sea deseable que se puedan agregar categorías o tipos de gastos recurrentes que se puedan reutilizar para agregar en los siguientes meses. También guardar un histórico de gastos por categorías
+
+Esquema y estructura de la app de gestión de gastos para personas mayores Enfoque inicial: Progressive Web App (PWA) con posibilidad de escalado a app móvil.
+
+1️⃣ Módulos principales de la app
+
+🔹 Inicio / Dashboard • Vista rápida del total de gastos del mes. • Resumen por categorías. • Acceso rápido para agregar un nuevo gasto.
+
+🔹 Registro de gastos • Formulario para agregar un gasto. • Selección de categoría (reutilizable o personalizada). • Opcional: Ingreso por voz para facilitar el uso.
+
+🔹 Historial de gastos • Lista de meses anteriores con desglose por categoría. • Gráficos sencillos para visualizar tendencias.
+
+🔹 Reportes y exportación • Generación de resumen totalizado en PDF o Excel. • Opción para imprimir o compartir.
+
+🔹 Configuración • Personalización de categorías de gastos. • Opciones de almacenamiento (local o sincronización en la nube).
+
+2️⃣ Flujo de navegación
+
+📌 Pantalla Principal (Dashboard) ➡️ Acceso a: • Registro de gastos • Historial • Configuración • Generar reportes
+
+📌 Registro de Gastos ➡️ Selección de: • Monto • Categoría (creada previamente o nueva) • Fecha • Nota opcional
+
+📌 Historial de Gastos ➡️ Selección de mes ➡️ Resumen de gastos ➡️ Opcional: Edición de gastos pasados
+
+📌 Generación de Reportes ➡️ Selección de formato (PDF o Excel) ➡️ Opción de descarga o compartir
+
+📌 Configuración ➡️ Edición de categorías ➡️ Opciones de almacenamiento
+
+Quiero que lo primeo que hagamos sea un diseño responvie que pueda reflejar lo que he descrito. Luego sólo sugerir cuál puede ser el mejor modo para hacer la codificacion, si mejor es React + Next.js o Vue + Nuxt.js teniendo en mente que en principio sería una PWA para luego poder escalar a una app móvil
