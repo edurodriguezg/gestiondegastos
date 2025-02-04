@@ -4,14 +4,16 @@ import { z } from "zod";
 
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name").notNull().unique(),
 });
 
 export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
   amount: integer("amount").notNull(),
   description: text("description").notNull(),
-  categoryId: integer("category_id").notNull(),
+  categoryId: integer("category_id")
+    .notNull()
+    .references(() => categories.id),
   date: timestamp("date").notNull(),
 });
 
