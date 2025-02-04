@@ -42,8 +42,12 @@ export default function AddExpense() {
     resolver: zodResolver(
       insertExpenseSchema.extend({
         amount: insertExpenseSchema.shape.amount.transform((val) => {
-          const numericValue = typeof val === 'string' ? parseFloat(val) : val;
-          return Math.round(numericValue * 100);
+          if (typeof val === "string") {
+            const parsed = parseFloat(val);
+            if (isNaN(parsed)) throw new Error("Invalid amount");
+            return Math.round(parsed * 100);
+          }
+          return Math.round(val * 100);
         }),
       })
     ),
@@ -67,10 +71,10 @@ export default function AddExpense() {
       });
       navigate("/");
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to add expense. Please try again.",
+        description: error.message || "Failed to add expense. Please try again.",
         variant: "destructive",
       });
     },
@@ -106,7 +110,7 @@ export default function AddExpense() {
           <FormField
             control={form.control}
             name="amount"
-            render={({ field: { onChange, ...field } }) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-lg">Amount ($)</FormLabel>
                 <FormControl>
@@ -114,8 +118,14 @@ export default function AddExpense() {
                     {...field}
                     type="number"
                     step="0.01"
-                    onChange={(e) => onChange(e.target.value)}
+                    min="0.01"
                     className="text-lg p-6"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || parseFloat(value) > 0) {
+                        field.onChange(value);
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

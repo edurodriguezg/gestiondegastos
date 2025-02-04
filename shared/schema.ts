@@ -21,12 +21,20 @@ export const insertCategorySchema = createInsertSchema(categories).pick({
   name: true,
 });
 
-export const insertExpenseSchema = createInsertSchema(expenses).pick({
-  amount: true,
-  description: true,
-  categoryId: true,
-  date: true,
-});
+// Modify the expense schema to properly handle amount validation
+export const insertExpenseSchema = createInsertSchema(expenses)
+  .extend({
+    amount: z.number().or(z.string().regex(/^\d+\.?\d*$/).transform(Number))
+      .refine((val) => !isNaN(val) && val > 0, {
+        message: "Amount must be a positive number",
+      }),
+  })
+  .pick({
+    amount: true,
+    description: true,
+    categoryId: true,
+    date: true,
+  });
 
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Category = typeof categories.$inferSelect;
