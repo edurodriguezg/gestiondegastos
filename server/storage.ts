@@ -6,6 +6,7 @@ export interface IStorage {
   // Categories
   getCategories(): Promise<Category[]>;
   createCategory(category: InsertCategory): Promise<Category>;
+  deleteCategory(id: number): Promise<void>;
 
   // Expenses
   getExpenses(): Promise<Expense[]>;
@@ -24,6 +25,21 @@ export class DatabaseStorage implements IStorage {
       .values(insertCategory)
       .returning();
     return category;
+  }
+
+  async deleteCategory(id: number): Promise<void> {
+    // Check if there are any expenses using this category
+    const [expense] = await db
+      .select()
+      .from(expenses)
+      .where(eq(expenses.categoryId, id))
+      .limit(1);
+
+    if (expense) {
+      throw new Error("Cannot delete category that has expenses");
+    }
+
+    await db.delete(categories).where(eq(categories.id, id));
   }
 
   async getExpenses(): Promise<Expense[]> {
@@ -45,10 +61,10 @@ export class DatabaseStorage implements IStorage {
     return db
       .select()
       .from(expenses)
-      .where((eb) => 
-        eb.and(
-          gte(eb.date, startDate),
-          lte(eb.date, endDate)
+      .where(
+        eb => eb.and(
+          gte(expenses.date, startDate),
+          lte(expenses.date, endDate)
         )
       );
   }

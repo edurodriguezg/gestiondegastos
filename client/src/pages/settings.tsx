@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Trash2Icon } from "lucide-react";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -31,7 +32,7 @@ export default function Settings() {
     },
   });
 
-  const mutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: async (values: any) => {
       return apiRequest("POST", "/api/categories", values);
     },
@@ -52,6 +53,26 @@ export default function Settings() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("DELETE", `/api/categories/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete category. It might have expenses associated with it.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading) {
     return <SettingsSkeleton />;
   }
@@ -67,7 +88,7 @@ export default function Settings() {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+              onSubmit={form.handleSubmit((values) => createMutation.mutate(values))}
               className="space-y-6"
             >
               <FormField
@@ -87,21 +108,30 @@ export default function Settings() {
               <Button
                 type="submit"
                 className="w-full text-xl p-6 h-auto"
-                disabled={mutation.isPending}
+                disabled={createMutation.isPending}
               >
-                {mutation.isPending ? "Adding..." : "Add Category"}
+                {createMutation.isPending ? "Adding..." : "Add Category"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 space-y-2">
             <h3 className="text-xl font-medium">Existing Categories</h3>
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <div
                 key={category.id}
                 className="flex items-center justify-between p-4 bg-muted rounded-lg"
               >
                 <span className="text-lg">{category.name}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => deleteMutation.mutate(category.id)}
+                  disabled={deleteMutation.isPending}
+                >
+                  <Trash2Icon className="h-5 w-5" />
+                </Button>
               </div>
             ))}
           </div>

@@ -41,7 +41,10 @@ export default function AddExpense() {
   const form = useForm({
     resolver: zodResolver(
       insertExpenseSchema.extend({
-        amount: insertExpenseSchema.shape.amount.transform((val) => val * 100),
+        amount: insertExpenseSchema.shape.amount.transform((val) => {
+          const numericValue = typeof val === 'string' ? parseFloat(val) : val;
+          return Math.round(numericValue * 100);
+        }),
       })
     ),
     defaultValues: {
@@ -103,7 +106,7 @@ export default function AddExpense() {
           <FormField
             control={form.control}
             name="amount"
-            render={({ field }) => (
+            render={({ field: { onChange, ...field } }) => (
               <FormItem>
                 <FormLabel className="text-lg">Amount ($)</FormLabel>
                 <FormControl>
@@ -111,6 +114,7 @@ export default function AddExpense() {
                     {...field}
                     type="number"
                     step="0.01"
+                    onChange={(e) => onChange(e.target.value)}
                     className="text-lg p-6"
                   />
                 </FormControl>
