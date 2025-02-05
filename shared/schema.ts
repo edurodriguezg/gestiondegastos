@@ -28,6 +28,7 @@ export const insertExpenseSchema = createInsertSchema(expenses)
       .refine((val) => !isNaN(val) && val > 0, {
         message: "Amount must be a positive number",
       }),
+    date: z.coerce.date()
   })
   .pick({
     amount: true,
