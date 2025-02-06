@@ -13,10 +13,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
         <div className="container mx-auto px-4">
           <div className="flex justify-around py-2">
-            <NavLink href="/" icon={<HomeIcon />} label="Home" active={location === "/"} />
-            <NavLink href="/add" icon={<PlusCircleIcon />} label="Add" active={location === "/add"} />
-            <NavLink href="/history" icon={<ClockIcon />} label="History" active={location === "/history"} />
-            <NavLink href="/settings" icon={<SettingsIcon />} label="Settings" active={location === "/settings"} />
+            <NavLink href="/" icon={<HomeIcon />} label="Inicio" active={location === "/"} />
+            <NavLink href="/add" icon={<PlusCircleIcon />} label="Agregar" active={location === "/add"} />
+            <NavLink href="/history" icon={<ClockIcon />} label="Historial" active={location === "/history"} />
+            <NavLink href="/settings" icon={<SettingsIcon />} label="Ajustes" active={location === "/settings"} />
           </div>
         </div>
       </nav>

@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
 export default function AddExpense() {
@@ -44,7 +45,7 @@ export default function AddExpense() {
         amount: insertExpenseSchema.shape.amount.transform((val) => {
           if (typeof val === "string") {
             const parsed = parseFloat(val);
-            if (isNaN(parsed)) throw new Error("Invalid amount");
+            if (isNaN(parsed)) throw new Error("Monto inválido");
             return Math.round(parsed * 100);
           }
           return Math.round(val * 100);
@@ -66,27 +67,27 @@ export default function AddExpense() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
       toast({
-        title: "Success",
-        description: "Expense added successfully",
+        title: "¡Éxito!",
+        description: "Gasto agregado correctamente",
       });
       navigate("/");
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to add expense. Please try again.",
+        description: error.message || "No se pudo agregar el gasto. Por favor, intente nuevamente.",
         variant: "destructive",
       });
     },
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Cargando...</div>;
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Add Expense</h1>
+      <h1 className="text-3xl font-bold">Agregar Gasto</h1>
 
       <Form {...form}>
         <form
@@ -98,7 +99,7 @@ export default function AddExpense() {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg">Description</FormLabel>
+                <FormLabel className="text-lg">Descripción</FormLabel>
                 <FormControl>
                   <Input {...field} className="text-lg p-6" />
                 </FormControl>
@@ -112,7 +113,7 @@ export default function AddExpense() {
             name="amount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg">Amount ($)</FormLabel>
+                <FormLabel className="text-lg">Monto ($)</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -138,14 +139,14 @@ export default function AddExpense() {
             name="categoryId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg">Category</FormLabel>
+                <FormLabel className="text-lg">Categoría</FormLabel>
                 <Select
                   onValueChange={(value) => field.onChange(parseInt(value))}
                   value={field.value?.toString()}
                 >
                   <FormControl>
                     <SelectTrigger className="text-lg p-6">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Seleccione una categoría" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -170,7 +171,7 @@ export default function AddExpense() {
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg">Date</FormLabel>
+                <FormLabel className="text-lg">Fecha</FormLabel>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -179,7 +180,7 @@ export default function AddExpense() {
                         className="w-full text-lg p-6 h-auto"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {format(field.value, "PPP")}
+                        {format(field.value, "PPP", { locale: es })}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -192,6 +193,7 @@ export default function AddExpense() {
                         setIsCalendarOpen(false);
                       }}
                       initialFocus
+                      locale={es}
                     />
                   </PopoverContent>
                 </Popover>
@@ -205,7 +207,7 @@ export default function AddExpense() {
             className="w-full text-xl p-6 h-auto"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Adding..." : "Add Expense"}
+            {mutation.isPending ? "Agregando..." : "Agregar Gasto"}
           </Button>
         </form>
       </Form>

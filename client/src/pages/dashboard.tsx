@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseCard } from "@/components/expense-card";
 import { type Expense, type Category } from "@shared/schema";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { PiggyBankIcon, TrendingUpIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -38,22 +39,24 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Expense Tracker</h1>
+      <h1 className="text-3xl font-bold">Control de Gastos</h1>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">Monthly Total</CardTitle>
+          <CardTitle className="text-2xl font-bold">Total Mensual</CardTitle>
           <PiggyBankIcon className="h-8 w-8 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold">${(totalAmount / 100).toFixed(2)}</div>
-          <p className="text-muted-foreground">{format(currentMonth, "MMMM yyyy")}</p>
+          <p className="text-muted-foreground">
+            {format(currentMonth, "MMMM yyyy", { locale: es })}
+          </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">By Category</CardTitle>
+          <CardTitle className="text-2xl font-bold">Por Categoría</CardTitle>
           <TrendingUpIcon className="h-8 w-8 text-primary" />
         </CardHeader>
         <CardContent>
@@ -70,7 +73,7 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Recent Expenses</h2>
+      <h2 className="text-2xl font-bold mt-8 mb-4">Gastos Recientes</h2>
       {monthlyExpenses
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 5)

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format, subMonths, startOfMonth } from "date-fns";
+import { es } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function History() {
@@ -41,7 +42,7 @@ export default function History() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Expense History</h1>
+      <h1 className="text-3xl font-bold">Historial de Gastos</h1>
 
       <div className="space-y-4">
         <Select
@@ -49,7 +50,7 @@ export default function History() {
           onValueChange={(value) => setSelectedDate(new Date(value))}
         >
           <SelectTrigger className="text-lg p-6">
-            <SelectValue placeholder="Select month" />
+            <SelectValue placeholder="Seleccionar mes" />
           </SelectTrigger>
           <SelectContent>
             {months.map((date) => (
@@ -58,7 +59,7 @@ export default function History() {
                 value={format(date, "yyyy-MM")}
                 className="text-lg"
               >
-                {format(date, "MMMM yyyy")}
+                {format(date, "MMMM yyyy", { locale: es })}
               </SelectItem>
             ))}
           </SelectContent>

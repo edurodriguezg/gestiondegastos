@@ -40,14 +40,14 @@ export default function Settings() {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       form.reset();
       toast({
-        title: "Success",
-        description: "Category added successfully",
+        title: "¡Éxito!",
+        description: "Categoría agregada correctamente",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to add category. Please try again.",
+        description: "No se pudo agregar la categoría. Por favor, intente nuevamente.",
         variant: "destructive",
       });
     },
@@ -60,14 +60,14 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       toast({
-        title: "Success",
-        description: "Category deleted successfully",
+        title: "¡Éxito!",
+        description: "Categoría eliminada correctamente",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete category. It might have expenses associated with it.",
+        description: error.message || "No se pudo eliminar la categoría. Puede que tenga gastos asociados.",
         variant: "destructive",
       });
     },
@@ -79,11 +79,11 @@ export default function Settings() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Settings</h1>
+      <h1 className="text-3xl font-bold">Ajustes</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Categories</CardTitle>
+          <CardTitle className="text-2xl">Categorías</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -96,7 +96,7 @@ export default function Settings() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">New Category Name</FormLabel>
+                    <FormLabel className="text-lg">Nombre de la Nueva Categoría</FormLabel>
                     <FormControl>
                       <Input {...field} className="text-lg p-6" />
                     </FormControl>
@@ -110,13 +110,13 @@ export default function Settings() {
                 className="w-full text-xl p-6 h-auto"
                 disabled={createMutation.isPending}
               >
-                {createMutation.isPending ? "Adding..." : "Add Category"}
+                {createMutation.isPending ? "Agregando..." : "Agregar Categoría"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 space-y-2">
-            <h3 className="text-xl font-medium">Existing Categories</h3>
+            <h3 className="text-xl font-medium">Categorías Existentes</h3>
             {categories?.map((category) => (
               <div
                 key={category.id}

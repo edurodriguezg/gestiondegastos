@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { type Expense, type Category } from "@shared/schema";
 
 export function ExpenseCard({ expense, category }: { expense: Expense; category: Category }) {
@@ -14,7 +15,7 @@ export function ExpenseCard({ expense, category }: { expense: Expense; category:
           <div className="text-right">
             <p className="text-xl font-bold">${(expense.amount / 100).toFixed(2)}</p>
             <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(expense.date), { addSuffix: true })}
+              {formatDistanceToNow(new Date(expense.date), { addSuffix: true, locale: es })}
             </p>
           </div>
         </div>
