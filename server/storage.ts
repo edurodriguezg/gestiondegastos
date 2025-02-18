@@ -2,6 +2,17 @@ import { eq, gte, lte, and } from "drizzle-orm"
 import { db } from "./db"
 import { categories, expenses } from "@shared/schema"
 import type { InsertCategory, InsertExpense } from "@shared/schema"
+import { dollarsToCents, centsToDollars } from "@shared/schema"
+
+class DatabaseError extends Error {
+  constructor(
+    message: string,
+    public cause?: unknown,
+  ) {
+    super(message)
+    this.name = "DatabaseError"
+  }
+}
 
 export class DatabaseStorage {
   async getCategories() {
@@ -9,7 +20,7 @@ export class DatabaseStorage {
       return await db.select().from(categories)
     } catch (error) {
       console.error("Error in getCategories:", error)
-      throw new Error("Failed to fetch categories")
+      throw new DatabaseError("Failed to fetch categories", error)
     }
   }
 
@@ -19,76 +30,88 @@ export class DatabaseStorage {
       return category
     } catch (error) {
       console.error("Error in createCategory:", error)
-      throw new Error("Failed to create category")
+      if (error instanceof Error && error.message.includes("unique constraint")) {
+        throw new DatabaseError("Category name already exists")
+      }
+      throw new DatabaseError("Failed to create category", error)
     }
   }
 
   async deleteCategory(id: number) {
     try {
-      // First check if category has expenses
       const [expense] = await db.select().from(expenses).where(eq(expenses.categoryId, id)).limit(1)
 
       if (expense) {
-        throw new Error("Cannot delete category that has expenses")
+        throw new DatabaseError("Cannot delete category that has expenses")
       }
 
       await db.delete(categories).where(eq(categories.id, id))
     } catch (error) {
       console.error("Error in deleteCategory:", error)
-      throw error // Re-throw to maintain the original error message
+      throw error instanceof DatabaseError ? error : new DatabaseError("Failed to delete category", error)
     }
   }
 
   async getExpenses() {
     try {
-      return await db.select().from(expenses)
+      const result = await db.select().from(expenses)
+      return result.map((expense) => ({
+        ...expense,
+        amount: centsToDollars(expense.amount),
+      }))
     } catch (error) {
       console.error("Error in getExpenses:", error)
-      throw new Error("Failed to fetch expenses")
+      throw new DatabaseError("Failed to fetch expenses", error)
     }
   }
 
   async createExpense(insertExpense: InsertExpense) {
     try {
-      // Convert amount to cents if it's in dollars
-      const amountInCents = Math.round(insertExpense.amount * 100)
+      console.log("Creating expense with data:", insertExpense)
+
+      const [category] = await db.select().from(categories).where(eq(categories.id, insertExpense.categoryId))
+
+      if (!category) {
+        throw new DatabaseError("Category not found")
+      }
 
       const [expense] = await db
         .insert(expenses)
         .values({
           ...insertExpense,
-          amount: amountInCents,
+          amount: dollarsToCents(insertExpense.amount),
         })
         .returning()
 
+      console.log("Created expense:", expense)
+
       return {
         ...expense,
-        amount: expense.amount / 100, // Convert back to dollars for the response
+        amount: centsToDollars(expense.amount),
       }
     } catch (error) {
       console.error("Error in createExpense:", error)
-      throw new Error("Failed to create expense")
+      throw new DatabaseError("Failed to create expense", error)
     }
   }
 
   async getExpensesByMonth(year: number, month: number) {
     try {
-      const startDate = new Date(year, month, 1)
-      const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999)
+      const startDate = new Date(year, month - 1, 1) // Note: month is 0-indexed in Date constructor
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999)
 
       const results = await db
         .select()
         .from(expenses)
         .where(and(gte(expenses.date, startDate), lte(expenses.date, endDate)))
 
-      // Convert amounts from cents to dollars
       return results.map((expense) => ({
         ...expense,
-        amount: expense.amount / 100,
+        amount: centsToDollars(expense.amount),
       }))
     } catch (error) {
       console.error("Error in getExpensesByMonth:", error)
-      throw new Error("Failed to fetch expenses for the specified month")
+      throw new DatabaseError("Failed to fetch expenses for the specified month", error)
     }
   }
 }
