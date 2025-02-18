@@ -1,6 +1,6 @@
 import { expenses, categories, type Category, type InsertCategory, type Expense, type InsertExpense } from "@shared/schema";
 import { db } from "./db";
-import { eq, gte, lte } from "drizzle-orm";
+import { eq, gte, lte, and } from "drizzle-orm";
 
 export interface IStorage {
   // Categories
@@ -57,12 +57,12 @@ export class DatabaseStorage implements IStorage {
   async getExpensesByMonth(year: number, month: number): Promise<Expense[]> {
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
-
+  
     return db
       .select()
       .from(expenses)
       .where(
-        eb => eb.and(
+        and(
           gte(expenses.date, startDate),
           lte(expenses.date, endDate)
         )
